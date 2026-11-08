@@ -1,0 +1,597 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Оконный кондиционер — трёхлопастная крыльчатка наружного вентилятора</title><style>body{margin:0;background:#e9eef4;color:#172534;font:15px system-ui,Arial}header{padding:15px 18px;background:white}h1{font-size:18px;margin:0 0 5px}p{margin:4px 0;color:#526271;font-size:13px}canvas{display:block;width:100%;height:70vh;min-height:380px;touch-action:none;background:linear-gradient(#f5f8fb,#dce6ef)}nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px}button{border:1px solid #bcc8d5;border-radius:8px;background:white;padding:10px 14px;font-size:14px}footer{font-size:12px;text-align:center;color:#647484;padding:0 12px 20px}</style></head><body><header><h1>Оконный кондиционер — воздушные потоки и охлаждение</h1><p>Испаритель 275 × 195 × 40 мм расположен над ванночкой (Z=52–247 мм). Вентилятор расположен по центру испарителя (ось Z=149,5 мм). Добавлен прямоугольно-круглый диффузор: выход Ø128 мм немного меньше внутреннего входного кольца вентилятора Ø134 мм. Левая боковая стенка со стороны испарителя снята; остальные элементы сохранены. В нише над испарителем размещены горизонтально лежащий конденсатор компрессора 30 мкФ, горизонтальная плата управления и два прямоугольных конденсатора вентиляторов по 2 мкФ. Добавлена сплошная горизонтальная перегородка на отметке Z=320 мм, полностью закрывающая сверху только отсек вентилятора; ее край повторяет перегородку компрессорного отсека, без захода в компрессорный отсек. Квадратное отверстие 100 × 100 мм расположено в дальнем углу. Одна вертикальная стенка вдоль Y=143 продлена до перегородки компрессорного отсека, от X=186 до X=468, на высотах Z=247–319 мм. Под ней добавлена сплошная горизонтальная стенка на высоте Z=245–247 мм, между вертикальной стенкой, боковой стенкой, задней стенкой и перегородкой компрессорного отсека. Сохранены все остальные детали и управление масштабом.</p></header><canvas id="view"></canvas><nav><button data-view="iso">Общий вид</button><button data-view="top">Сверху</button><button data-view="front">Спереди</button><button data-view="rear">Сзади</button><button data-view="side">Сбоку</button><button id="zout">−</button><span id="zoomlabel" style="align-self:center">100%</span><button id="zin">+</button><button id="zreset">Сброс масштаба</button></nav><footer>Поворачивайте одним пальцем, увеличивайте двумя пальцами или кнопками. WebGL с буфером глубины. Файл автономный, интернет не нужен.</footer><script>
+(()=>{
+const cv=document.getElementById('view'),gl=cv.getContext('webgl',{antialias:true,alpha:true}),F=[];
+const C={metal:'#b8c2cb',well:'#91aabd',pan:'#7ca8c6',floor:'#a5c9dc',black:'#292d35',receiver:'#373d46',divider:'#a6b7c7',blue:'#5185c4',blade:'#343941',rim:'#4c525b',motor:'#59616b',bolt:'#929ba6',rubber:'#454950',green:'#359b51',orange:'#ef5729',float:'#39383d',port:'#656b72',spigot:'#cda36b',tube:'#41bbd0',pump:'#e75b32',pumpcap:'#f0784d',white:'#dedfdb',connection:'#35b777',outlet:'#b05ce8',fins:'#384d55',finlight:'#56747a',copper:'#b77743',rail:'#8d9aa5',diffuser:'#9eb7c8',diffuserEdge:'#69899e',pcb:'#237653',pcbEdge:'#164e3b',chip:'#252c36',terminal:'#c7d3df',capacitor:'#d9e0e5',capTop:'#667483',capSmall:'#e4e8ed',copperPad:'#d6a94e',redHot:'#e13a34',blueLiquid:'#217ee8',outer:'#e3e6e8',outerEdge:'#aeb6be',outerDark:'#8c969f',grille:'#f2f4f4',outerFan:'#454d55',outerBlade:'#68747d',outerFins:'#334b55',fanCable:'#20252c',boxGray:'#a3a8ae',water:'#67d7f4',waterDeep:'#3aa7d8',droplet:'#89e4ff',mist:'#b4edfa',warmAir:'#ef3030',coldAir:'#1688f5'};
+function face(p,c){F.push({p,c})}
+function box(x,y,z,X,Y,Z,c='metal'){const p=[[x,y,z],[X,y,z],[X,Y,z],[x,Y,z],[x,y,Z],[X,y,Z],[X,Y,Z],[x,Y,Z]];for(const a of [[0,1,2,3],[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7],[3,0,4,7]])face(a.map(i=>p[i]),c)}
+function cylZ(x,y,r,z,Z,c,n=16){for(let k=0;k<n;k++){let a=k*2*Math.PI/n,b=(k+1)*2*Math.PI/n;face([[x+r*Math.cos(a),y+r*Math.sin(a),z],[x+r*Math.cos(b),y+r*Math.sin(b),z],[x+r*Math.cos(b),y+r*Math.sin(b),Z],[x+r*Math.cos(a),y+r*Math.sin(a),Z]],c)}}
+function taper(x,y,r,R,z,Z,c,n=20){for(let k=0;k<n;k++){let a=k*2*Math.PI/n,b=(k+1)*2*Math.PI/n;face([[x+r*Math.cos(a),y+r*Math.sin(a),z],[x+r*Math.cos(b),y+r*Math.sin(b),z],[x+R*Math.cos(b),y+R*Math.sin(b),Z],[x+R*Math.cos(a),y+R*Math.sin(a),Z]],c)}}
+function cylY(x,z,r,y,Y,c,n=16){for(let k=0;k<n;k++){let a=k*2*Math.PI/n,b=(k+1)*2*Math.PI/n;face([[x+r*Math.cos(a),y,z+r*Math.sin(a)],[x+r*Math.cos(b),y,z+r*Math.sin(b)],[x+r*Math.cos(b),Y,z+r*Math.sin(b)],[x+r*Math.cos(a),Y,z+r*Math.sin(a)]],c)}}
+function cylX(y,z,r,x,X,c,n=16){for(let k=0;k<n;k++){let a=k*2*Math.PI/n,b=(k+1)*2*Math.PI/n;face([[x,y+r*Math.cos(a),z+r*Math.sin(a)],[x,y+r*Math.cos(b),z+r*Math.sin(b)],[X,y+r*Math.cos(b),z+r*Math.sin(b)],[X,y+r*Math.cos(a),z+r*Math.sin(a)]],c)}}
+function ringY(x,z,r,R,y,Y,c,n=20){const p=(rr,a,yy)=>[x+rr*Math.cos(a),yy,z+rr*Math.sin(a)];for(let k=0;k<n;k++){let a=k*2*Math.PI/n,b=(k+1)*2*Math.PI/n;face([p(r,a,y),p(R,a,y),p(R,b,y),p(r,b,y)],c);face([p(R,a,y),p(R,b,y),p(R,b,Y),p(R,a,Y)],c)}}
+function spring(x,y,z,Z,r){for(let j=0;j<32;j++){let a=j*8*Math.PI/32,b=(j+1)*8*Math.PI/32;face([[x+r*Math.cos(a)-2,y+r*Math.sin(a),z+(Z-z)*j/32],[x+r*Math.cos(a)+2,y+r*Math.sin(a),z+(Z-z)*j/32],[x+r*Math.cos(b),y+r*Math.sin(b),z+(Z-z)*(j+1)/32]],'green')}}
+function tube(points,r,c){const n=12;for(let i=0;i<points.length-1;i++){let a=points[i],b=points[i+1],d=b.map((v,j)=>v-a[j]),l=Math.hypot(...d)||1,t=d.map(v=>v/l),u=Math.abs(t[2])<.9?[-t[1],t[0],0]:[0,-t[2],t[1]],ul=Math.hypot(...u)||1;u=u.map(v=>v/ul);let v=[t[1]*u[2]-t[2]*u[1],t[2]*u[0]-t[0]*u[2],t[0]*u[1]-t[1]*u[0]];const p=(q,ang)=>q.map((x,j)=>x+r*(u[j]*Math.cos(ang)+v[j]*Math.sin(ang)));for(let k=0;k<n;k++){let aa=k*2*Math.PI/n,bb=(k+1)*2*Math.PI/n;face([p(a,aa),p(a,bb),p(b,bb),p(b,aa)],c)}}}
+// Корпус 470 x 245 x 380
+box(0,0,0,470,55,2);box(0,55,0,375,195,2);box(420,55,0,470,195,2);box(0,195,0,470,245,2);
+box(375,55,-26,420,195,-24,'well');box(375,55,-24,377,195,0,'well');box(418,55,-24,420,195,0,'well');box(377,55,-24,418,57,0,'well');box(377,193,-24,418,195,0,'well');
+box(0,243,0,470,245,380);/* Левая боковая стенка снята для открытого вида */box(2,0,2,468,2,12);box(0,235,378,470,245,380);
+// Сплошная горизонтальная перегородка над отсеком вентилятора.
+// На 60 мм ниже верхнего края корпуса, Z=319..321 мм.
+// Граница слева строго повторяет перегородку компрессорного отсека:
+// материал не заходит в компрессорный отсек.
+const coverOutline=[[148,2],[468,2],[468,243],[186,243],[186,80],[154,61],[148,48]];
+// Делим поверхность на полосы по точкам изменения формы перегородки.
+const coverBands=[
+ [[148,2],[468,2],[468,48],[148,48]],
+ [[148,48],[468,48],[468,61],[154,61]],
+ [[154,61],[468,61],[468,80],[186,80]],
+ [[186,80],[468,80],[468,143],[186,143]],
+ [[186,143],[368,143],[368,243],[186,243]]
+];
+for(const poly of coverBands){
+ face(poly.map(([x,y])=>[x,y,321]),'metal');
+ face([...poly].reverse().map(([x,y])=>[x,y,319]),'metal');
+}
+for(let i=0;i<coverOutline.length;i++){
+ const a=coverOutline[i],b=coverOutline[(i+1)%coverOutline.length];
+ face([[a[0],a[1],319],[b[0],b[1],319],[b[0],b[1],321],[a[0],a[1],321]],'metal');
+}
+// Вырез 100 × 100 мм в противоположном дальнем углу отсека вентилятора:
+// X=368..468, Y=143..243. Две стороны совпадают с границами полки.
+// Облицовка открытых внутренних торцов металла толщиной 2 мм.
+for(const [a,b] of [ [[368,143],[368,243]], [[368,143],[468,143]] ]){
+ face([[a[0],a[1],319],[b[0],b[1],319],[b[0],b[1],321],[a[0],a[1],321]],'metal');
+}
+// Оставлена одна вертикальная стенка по линии выреза 100 × 100 мм, продлённая до перегородки компрессорного отсека.
+// От нижней поверхности горизонтальной перегородки (Z=319) до верхней кромки испарителя (Z=247).
+// Стенка ограничена отсеком вентилятора, в компрессорный отсек не заходит.
+// Убрана сторона вдоль X=368, опускавшаяся на вентилятор. Существующая стенка вдоль Y=143 продлена от X=368 до X=186.
+box(186,142,247,468,144,319,'metal');
+// Нижняя горизонтальная стенка направлена от вертикальной стенки Y=143
+// К ИСПАРИТЕЛЮ (вперёд, до Y=2), а не к задней стенке.
+// Её левый край повторяет изломы перегородки компрессорного отсека.
+// Толщина 2 мм, верхняя поверхность на Z=247.
+const lowerBands=[
+ [[148,2],[468,2],[468,48],[148,48]],
+ [[148,48],[468,48],[468,61],[154,61]],
+ [[154,61],[468,61],[468,80],[186,80]],
+ [[186,80],[468,80],[468,143],[186,143]]
+];
+for(const poly of lowerBands){
+ face(poly.map(([x,y])=>[x,y,247]),'metal');
+ face([...poly].reverse().map(([x,y])=>[x,y,245]),'metal');
+}
+const lowerOutline=[[148,2],[468,2],[468,143],[186,143],[186,80],[154,61],[148,48]];
+for(let i=0;i<lowerOutline.length;i++){
+ const a=lowerOutline[i],b=lowerOutline[(i+1)%lowerOutline.length];
+ face([[a[0],a[1],245],[b[0],b[1],245],[b[0],b[1],247],[a[0],a[1],247]],'metal');
+}
+// Поддон
+box(150,2,2,468,55,4,'floor');box(150,2,4,468,4,52,'pan');box(150,53,4,468,55,52,'pan');box(150,4,4,152,53,52,'pan');box(466,4,4,468,53,52,'pan');ringY(397.5,11.5,5.2,7.5,55,75,'spigot');ringY(397.5,11.5,5.2,10,54,57,'spigot');
+// Поплавок
+box(376,104.5,-24,419,167.5,9,'float');box(376,104.5,9,419,167.5,18,'orange');box(381.5,112,18,413.5,129,21,'orange');cylZ(397.5,120,11,18,22,'orange');cylZ(397.5,154,5,18,22,'orange');ringY(397.5,-8,3.5,6,93.5,104.5,'port');ringY(397.5,-8,3.5,6,167.5,178.5,'port');tube([[397.5,70,11.5],[397.5,84,11.5],[397.5,84,-8],[397.5,98,-8]],5.2,'tube');
+// Насос 85 x 35 x 40; зазор до задней стенки 10 мм
+box(268,198,2,353,233,42,'pump');box(271,199,37,350,232,42,'pumpcap');box(278,197,10,328,198,34,'pumpcap');cylX(215.5,22,7,353,369,'port');cylX(215.5,22,4,369,376,'white');cylX(215.5,22,7,252,268,'port');cylX(215.5,22,4,245,252,'white');tube([[397.5,174,-8],[397.5,185,-8],[397.5,185,22],[390,185,22],[390,215.5,22],[365,215.5,22]],3,'connection');
+// Последний согласованный маршрут: внутренняя сторона задней стенки, y=239.
+// Конец трубки соответствует последней показанной версии, положение прохода в синем кронштейне ещё подлежит уточнению.
+tube([[249,215.5,22],[186,215.5,22],[140,215.5,22],[108,215.5,22],[108,239,22],[108,239,112],[75,239,112]],3,'outlet');
+// Компрессор и ресивер
+for(const [x,y] of [[20,140],[70,20],[145,105]]){cylZ(x,y,17,2,18,'rubber');cylZ(x,y,8,18,43,'bolt');spring(x,y,20,42,13)}face([[8,145,44],[62,9,44],[157,103,44]],'bolt');taper(86,95,43,57,52,72,'black');cylZ(86,95,57,72,235,'black');taper(86,95,57,49,235,269,'black');taper(86,95,49,27,269,293,'black');cylZ(86,95,13,293,304,'black');taper(86,171,13,21,92,106,'receiver');cylZ(86,171,21,106,208,'receiver');taper(86,171,21,13,208,220,'receiver');
+// Красная трубка Ø9 мм: от верха компрессора горизонтально к отсутствующей боковой стенке,
+// зазор 10 мм (X=10); затем вниз к уровню коммуникационной прорези (Z=102),
+// поворот на 90° в направлении кронштейна; конец за 40 мм до плоскости выреза (Y=206).
+cylZ(86,95,5,302,310,'port',16);
+tube([[86,95,309],[10,95,309],[10,95,102],[10,206,102]],4.5,'redHot');
+
+// Узел коллектора и пяти капилляров поднят на 12 мм, вместе с конечным участком красной трубки.
+// Коллектор на конце красной нагнетательной трубки: Ø15 мм, длина 30 мм.
+// Ось продолжает последний прямой участок красной трубки по +Y.
+// Последние 10 мм плавно сплющены в вертикальную щель толщиной 4 мм.
+// Пять капилляров Ø4 мм размещены вертикальным рядом и выступают на 40 мм.
+const headerX=10,headerZ=102,headerY=206;
+const headerRing=(y,rx,rz,n=24)=>Array.from({length:n},(_,i)=>{
+ let a=2*Math.PI*i/n;return [headerX+rx*Math.cos(a),y,headerZ+rz*Math.sin(a)];
+});
+const headerSections=[headerRing(206,7.5,7.5),headerRing(225,7.5,7.5),headerRing(231,4.5,10.5),headerRing(236,2,12.5)];
+for(let j=0;j<headerSections.length-1;j++)for(let i=0;i<24;i++){
+ let k=(i+1)%24;face([headerSections[j][i],headerSections[j][k],headerSections[j+1][k],headerSections[j+1][i]],'copper');
+}
+// Торцевая кромка сплющенной трубки; открытый выход для пяти капилляров.
+for(let i=0;i<24;i++){
+ let k=(i+1)%24;
+ // Тонкая видимая кромка без перекрытия открытого торца.
+ let a=headerSections[3][i],b=headerSections[3][k];
+ let ai=[headerX+(a[0]-headerX)*.88,236,headerZ+(a[2]-headerZ)*.88];
+ let bi=[headerX+(b[0]-headerX)*.88,236,headerZ+(b[2]-headerZ)*.88];
+ face([a,b,bi,ai],'copper');
+}
+// Пять капилляров Ø4 мм: сохраняем первый поворот на 90° вправо.
+// Удлиняем конец после первого поворота с 10 до 24 мм (+14 мм).
+// Затем ВТОРОЙ поворот на 90° влево и участок 50 мм.
+// ТРЕТИЙ поворот на 90° вправо: участок 45 мм (30 + 15).
+// ЧЕТВЁРТЫЙ поворот на 90° влево: новый участок 40 мм.
+for(let i=0;i<5;i++){
+ let z=headerZ+(i-2)*4.8;
+ tube([[headerX,233,z],[headerX,272,z],[headerX-24,272,z],[headerX-24,322,z],[headerX-69,322,z],[headerX-69,362,z]],2,'copper');
+}
+
+
+// Выходной переходник: пять капилляров входят в вертикально сплющенную
+// медную трубку Ø15 мм; далее переход к круглому Ø15 мм и красная Ø9 мм, 30 мм.
+// Продолжение последнего прямого участка по оси +Y.
+const exitX=headerX-69, exitZ=headerZ, exitY=362;
+const exitRing=(y,rx,rz,n=24)=>Array.from({length:n},(_,i)=>{
+ const a=2*Math.PI*i/n;return [exitX+rx*Math.cos(a),y,exitZ+rz*Math.sin(a)];
+});
+const exitSections=[
+ exitRing(exitY-3,2,12.5), // вертикальная сплющенная щель, охватывающая пять капилляров
+ exitRing(exitY+5,2,12.5),
+ exitRing(exitY+17,7.5,7.5),
+ exitRing(exitY+27,7.5,7.5)
+];
+for(let j=0;j<exitSections.length-1;j++)for(let i=0;i<24;i++){
+ const k=(i+1)%24;
+ face([exitSections[j][i],exitSections[j][k],exitSections[j+1][k],exitSections[j+1][i]],'copper');
+}
+// Красная выходная трубка Ø9 мм, длина 30 мм.
+tube([[exitX,exitY+27,exitZ],[exitX,exitY+57,exitZ]],4.5,'redHot');
+
+// Продолжение красной трубки Ø9 мм от выходного коллектора:
+// 90° налево — через открытую левую боковину наружного блока (X=-54)
+// с заходом на 10 мм внутрь; затем вертикально вниз до зазора над дном;
+// 90° к передней панели (Y=613), не доходя 15 мм до её края;
+// последний поворот 90° налево. Последний прямой участок пока 35 мм,
+// поскольку его длина не была указана.
+const pipeX=exitX, pipeY=exitY+57, pipeZ=exitZ;
+const insideX=-44, nearBottomZ=12, beforeFrontY=598;
+tube([[pipeX,pipeY,pipeZ],[insideX,pipeY,pipeZ],
+      [insideX,pipeY,nearBottomZ],[insideX,beforeFrontY,nearBottomZ],
+      [326-30,beforeFrontY,nearBottomZ], // до правой стороны 30 мм
+      [326-30,beforeFrontY-40,nearBottomZ], // налево, участок 40 мм
+      [insideX+40,beforeFrontY-40,nearBottomZ], // налево, 40 мм до исходной красной трубки
+      [insideX+40,beforeFrontY-70,nearBottomZ],
+      [326-30,beforeFrontY-70,nearBottomZ], // прямо до 30 мм от правого края корпуса
+      [326-30,beforeFrontY-130,nearBottomZ], // удлинение последнего участка ещё на 40 мм
+      [insideX+15,beforeFrontY-130,nearBottomZ], // 15 мм до соседней красной трубки (ось X=insideX)
+      [insideX+15,beforeFrontY-130,376], // вертикальный подъём к верху радиатора
+      [insideX+15,375,376], // к заднему радиатору
+      [insideX-1,375,376]],4.5,'redHot'); // вход с левого торца задней секции радиатора
+
+
+// Синяя трубка Ø3 мм: начинается с нижнего торца наружного радиатора,
+// но сразу направляется ВНУТРЬ корпуса (X >= -54), а не выходит наружу.
+// Только последний участок пересекает границу X=-54 рядом с красной трубкой.
+// Конечная точка синей трубки выше красной ровно на 15 мм.
+const blueExitZ=pipeZ+15;
+const blueInnerX=-35, blueInnerY=pipeY+20;
+tube([[-45,377,34],[-40,377,34],
+      [blueInnerX,392,34],[blueInnerX,blueInnerY,34],
+      [blueInnerX,blueInnerY,blueExitZ],
+      [-49,blueInnerY,blueExitZ],[-65,blueInnerY,blueExitZ]],1.5,'blueLiquid');
+// Синяя Ø3 мм повторяет геометрию верхнего оранжевого капилляра Ø4 мм.
+// Между наружными поверхностями сохраняется 2 мм: 2 + 1.5 + 2 = 5.5 мм по осям.
+const blueAboveZ=headerZ+2*4.8+5.5;
+tube([[-65,blueInnerY,blueExitZ],
+      [-65,blueInnerY,blueAboveZ],
+      [-65,362,blueAboveZ],
+      [headerX-69,362,blueAboveZ],
+      [headerX-69,322,blueAboveZ],
+      [headerX-24,322,blueAboveZ],
+      [headerX-24,272,blueAboveZ],
+      [headerX,272,blueAboveZ],
+      [headerX,233,blueAboveZ],
+      [headerX,221,blueAboveZ]],1.5,'blueLiquid');
+// Фиолетовая Ø4 мм от насоса повторяет оранжевую и синюю трассы.
+// На плоскости соединения оранжевых капилляров с красным коллектором
+// (Y=362), у наружного блока, поворачивает вертикально вверх
+// и поднимается до верхнего края корпуса (Z=380 мм).
+// Между синей и фиолетовой трубками сохраняется зазор 2 мм.
+const purpleOverBlueZ=blueAboveZ+5.5;
+tube([[75,239,112],
+      [headerX,239,112],
+      [headerX,239,purpleOverBlueZ],
+      [headerX,272,purpleOverBlueZ],
+      [headerX-24,272,purpleOverBlueZ],
+      [headerX-24,322,purpleOverBlueZ],
+      [headerX-69,322,purpleOverBlueZ],
+      [headerX-69,362,purpleOverBlueZ],
+      [headerX-69,362,380],[-42,362,380],[-42,348,380],[-42,348,344]],2,'outlet');
+
+// Кабель питания/управления наружного вентилятора от платы управления.
+// В зоне складного кронштейна проходит точно над фиолетовой трубкой,
+// затем отходит в сторону от её вертикального подъёма и идёт к мотору.
+const fanCableZ=purpleOverBlueZ+7;
+tube([[373,105,256],[373,105,305],[180,105,305],
+      [130,105,305],[130,18,305],[2,18,305],
+      [-35,18,305],[-35,239,305],
+      [-35,239,fanCableZ],[headerX,239,fanCableZ],
+      [headerX,272,fanCableZ],[headerX-24,272,fanCableZ],
+      [headerX-24,322,fanCableZ],[headerX-69,322,fanCableZ],
+      [headerX-69,348,fanCableZ],[-45,348,fanCableZ],
+      [-45,373,fanCableZ],[-45,389,fanCableZ],
+      [120,389,fanCableZ],[120,389,190],
+      [120,419,190],[136,419,190]],2.2,'fanCable');
+
+// Продолжение той же синей трубки к верхнему штуцеру ЛЕВОГО ТОРЦА испарителя.
+// Подвод обходит компрессор по свободному краю отсека (X=10, Y=18), затем пересекает разделительную стенку и входит в верхний торец испарителя.
+// Отвод от красной вертикальной трубки (X=10, Y=95):
+// сдвиг в сторону X=-2 до прохода мимо компрессора, без пересечения Ø9 мм.
+tube([[10,221,blueAboveZ],
+      [-2,221,blueAboveZ],
+      [-2,18,blueAboveZ],
+      [105,18,blueAboveZ],
+      [105,28,blueAboveZ],
+      [105,28,238],
+      [148,28,238],
+      [190,28,238],
+      [199,28,238]],1.5,'blueLiquid');
+
+// Перегородка с отверстием для трубки
+let divider=[[186,243],[186,80],[154,61],[148,48],[148,2]];for(let i=0;i<divider.length-1;i++){let a=divider[i],b=divider[i+1];if(i===0){for(let [z,Z] of [[2,17],[27,380]])face([[a[0],a[1],z],[b[0],b[1],z],[b[0],b[1],Z],[a[0],a[1],Z]],'divider');for(let [y,Y] of [[80,211],[220,243]])face([[186,y,17],[186,Y,17],[186,Y,27],[186,y,27]],'divider')}else face([[a[0],a[1],2],[b[0],b[1],2],[b[0],b[1],380],[a[0],a[1],380]],'divider')}
+// Вентилятор: ось Z=149.5 мм, центр испарителя (52+247)/2.
+let fanX=326,fanZ=149.5,point=(r,a,y)=>[fanX+r*Math.cos(a),y,fanZ+r*Math.sin(a)];ringY(fanX,fanZ,30,94,218,221,'black');for(let k=0;k<13;k++){let a=k*2*Math.PI/13,curve=(t,y)=>{let r=65+28*t,ang=a+.34*t+.055*Math.sin(Math.PI*t);return point(r,ang,y)};for(let j=0;j<9;j++){let t=j/9,u=(j+1)/9;face([curve(t,160),curve(u,160),curve(u,218),curve(t,218)],'blade')}}ringY(fanX,fanZ,67,95,158,161,'rim');for(let k=0;k<40;k++){let a=k*2*Math.PI/40,b=(k+1)*2*Math.PI/40;face([point(67,a,158),point(67,b,158),point(62,b,143),point(62,a,143)],'black')}ringY(fanX,fanZ,62,65,143,146,'rim');ringY(fanX,fanZ,91,95,216,222,'black');ringY(fanX,fanZ,27,36,163,216,'motor');cylY(fanX,fanZ,29,159,194,'motor');box(296,224,119.5,356,227,179.5,'bolt');for(let dx of [-20,20])for(let dz of [-20,20])cylY(fanX+dx,fanZ+dz,5,227,242,'bolt');
+// Синий складной кронштейн
+let lengths=[100,25,30,52,40,40,100],turns=[1,-1,1,-1,1,1],pos=[[0,0]],ang=0;for(let i=0;i<lengths.length;i++){let p=pos[pos.length-1];pos.push([p[0]+lengths[i]*Math.cos(ang),p[1]+lengths[i]*Math.sin(ang)]);if(i<turns.length)ang+=turns[i]*Math.PI/2}function bp(i,u,z){let a=pos[i],b=pos[i+1],t=u/lengths[i];return[116-a[0]-(b[0]-a[0])*t,246+a[1]+(b[1]-a[1])*t,322-z]}for(let i=0;i<7;i++){let slots=[];if(i===2)slots.push([0,30,182,232]);if(i===3)slots.push([0,52,182,232],[1,21,253,320]);if(i===4||i===5)slots.push([0,i===4?40:8,182,232]);let xs=[0,lengths[i]],zs=[0,320];for(let s of slots){xs.push(s[0],s[1]);zs.push(s[2],s[3])}xs=[...new Set(xs)].sort((a,b)=>a-b);zs=[...new Set(zs)].sort((a,b)=>a-b);for(let j=0;j<xs.length-1;j++)for(let k=0;k<zs.length-1;k++){let x=(xs[j]+xs[j+1])/2,z=(zs[k]+zs[k+1])/2;if(!slots.some(s=>x>s[0]&&x<s[1]&&z>s[2]&&z<s[3]))face([bp(i,xs[j],zs[k]),bp(i,xs[j+1],zs[k]),bp(i,xs[j+1],zs[k+1]),bp(i,xs[j],zs[k+1])],'blue')}}
+
+// Наружный корпус за синим кронштейном: без компрессорного отсека.
+// Габариты 380 (X) × 250 (Y) × 380 (Z) мм; Y=363..613. Левая сторона X=-54 вровень с левым краем кронштейна.
+// Корпус имеет открываемую боковую решетку конденсатора и круглый
+// вентилятор на дальней лицевой панели, по образцу фотографий.
+{
+ const X0=-54,X1=326,Y0=363,Y1=613,Z0=0,Z1=380,t=2;
+ // Дно сохранено; верхняя крышка и левая боковая стенка сняты.
+ box(X0,Y0,Z0,X1,Y1,Z0+t,'outer');
+ // Правая боковая стенка наружного блока снята; остальные детали сохранены.
+ // Вертикальный стальной уголок 40 × 40 мм в дальнем правом углу
+ // открытой боковины (у задней стенки со стороны кронштейна).
+ // Две перпендикулярные полки толщиной 2 мм, от дна до крышки.
+ box(X1-t,Y0,Z0+t,X1,Y0+40,Z1-t,'outerEdge');
+ box(X1-40,Y0,Z0+t,X1,Y0+t,Z1-t,'outerEdge');
+
+ // Г-образный теплообменник наружного блока: задняя плоскость и открытая правая боковина.
+ // Оребрение находится внутри габарита корпуса; уголок 40×40 сохраняется.
+ const coilZ0=22,coilZ1=378;
+ // Задняя секция вдоль всей ширины корпуса (внутри, у Y0).
+ const coilRearY=Y0+12;
+ box(X0+9,coilRearY-5,coilZ0,X0+12,coilRearY+7,coilZ1,'rail');
+ box(X1-12,coilRearY-5,coilZ0,X1-9,coilRearY+7,coilZ1,'rail');
+ for(let i=0;i<112;i++){
+  let x=X0+12+i*(X1-X0-24)/112;
+  box(x,coilRearY-5,coilZ0+2,x+.8,coilRearY+7,coilZ1-2,i%7===0?'finlight':'outerFins');
+ }
+ // Правая секция на месте снятой боковой стенки (X1), вдоль глубины корпуса.
+ const coilSideX=X1-11, sideY0=Y0+44,sideY1=Y1-15;
+ box(coilSideX-5,sideY0,coilZ0,coilSideX+7,sideY0+3,coilZ1,'rail');
+ box(coilSideX-5,sideY1-3,coilZ0,coilSideX+7,sideY1,coilZ1,'rail');
+ for(let i=0;i<68;i++){
+  let y=sideY0+3+i*(sideY1-sideY0-6)/68;
+  box(coilSideX-5,y,coilZ0+2,coilSideX+7,y+.8,coilZ1-2,i%7===0?'finlight':'outerFins');
+ }
+ // Медные горизонтальные трубки в обеих секциях и видимые развороты на торцах.
+ for(let j=0;j<14;j++){
+  const z=coilZ0+12+j*25.5;
+  tube([[X0+13,coilRearY+2,z],[X1-17,coilRearY+2,z]],2.3,'copper');
+  tube([[coilSideX+2,sideY0+4,z],[coilSideX+2,sideY1-5,z]],2.3,'copper');
+ }
+ for(let j=0;j<12;j+=2){
+  let z=coilZ0+12+j*25.5;
+  // Плавные U-образные медные калачи у свободных концов обеих секций.
+  let p1=[],p2=[];
+  for(let k=0;k<=16;k++){
+   let a=-Math.PI/2+Math.PI*k/16;
+   p1.push([X0+9-11*Math.cos(a),coilRearY+2,z+12.5+12.5*Math.sin(a)]);
+   p2.push([coilSideX+2,sideY1-4+11*Math.cos(a),z+12.5+12.5*Math.sin(a)]);
+  }
+  tube(p1,2.3,'copper');tube(p2,2.3,'copper');
+ }
+ // Серый открытый короб вдоль задней секции радиатора, снаружи.
+ // Со стороны радиатора расчёска прорезана до дна короба;
+ // зубцы узкие, с увеличенным расстоянием между ними.
+ {
+  const wall=1.5, zTop=coilZ1, zBase=zTop-40;
+  const xa=X0+9, xb=X1-9;
+  const yRadiatorOuter=coilRearY-5;
+  const ya=yRadiatorOuter-25, yb=yRadiatorOuter;
+  box(xa,ya,zBase,xb,yb,zBase+wall,'boxGray'); // дно
+  box(xa,ya,zBase,xb,ya+wall,zBase+20,'boxGray'); // наружная стенка понижена для видимости зубцов
+  const pitch=16, toothWidth=5;
+  for(let x=xa;x<xb;x+=pitch){
+   box(x,yb-wall,zBase,Math.min(x+toothWidth,xb),yb,zTop,'boxGray');
+  }
+  box(xb-wall,ya,zBase,xb,yb,zTop,'boxGray'); // закрытый правый торец
+  // Неглубокая голубая вода на дне открытого короба.
+  box(xa+1.6,ya+1.6,zBase+1.5,xb-1.6,yb-1.6,zBase+5.5,'water');
+ }
+ // Небольшой слой воды на дне наружного блока, ниже трубок и вентилятора.
+ box(X0+3,Y0+4,2.2,X1-3,Y1-4,5.5,'waterDeep');
+ // Локальная поверхность воды вокруг горячей красной трубки.
+ box(5,466,5.5,298,580,7.5,'water');
+ // Рамка у синего кронштейна, открытый центральный участок для коммуникаций.
+ for(const [a,b,c,d] of [[X0,X1,0,12],[X0,X1,368,380],[X0,X0+12,12,368],[X1-12,X1,12,368]])
+  box(a,Y0,c,b,Y0+3,d,'outerEdge');
+ // Лицевая панель со стороны улицы: квадратная рамка вокруг круглой решетки.
+ const cx=(X0+X1)/2,cz=190,R=165;
+ for(let k=0;k<80;k++){
+  const a=2*Math.PI*k/80,b=2*Math.PI*(k+1)/80;
+  const ray=(angle)=>{let dx=Math.cos(angle),dz=Math.sin(angle);let tx=Math.abs(dx)<1e-8?Infinity:(dx>0?(X1-cx)/dx:(X0-cx)/dx);let tz=Math.abs(dz)<1e-8?Infinity:(dz>0?(Z1-cz)/dz:(Z0-cz)/dz);return Math.min(tx,tz)};
+  const ra=ray(a),rb=ray(b);
+  face([[cx+R*Math.cos(a),Y1,cz+R*Math.sin(a)],[cx+ra*Math.cos(a),Y1,cz+ra*Math.sin(a)],[cx+rb*Math.cos(b),Y1,cz+rb*Math.sin(b)],[cx+R*Math.cos(b),Y1,cz+R*Math.sin(b)]],'outer');
+ }
+ // Кольцевая окантовка решетки.
+ ringY(cx,cz,R-3,R+5,Y1,Y1+3,'outerEdge',80);
+ // Кронштейн электродвигателя наружного вентилятора — жесткая вертикальная
+ // стальная траверса; верхняя крышка снята, траверса и мотор остаются на месте.
+ // Ось двигателя направлена вдоль глубины (Y), строго по центру крыльчатки.
+ const motorMountY=400; // задняя грань траверсы Y=393; до заднего радиатора Y=382 зазор 11 мм
+ box(cx-48,motorMountY-7,3,cx+48,motorMountY+7,377,'outerEdge');
+ // Верхняя и нижняя монтажные лапы траверсы с крепежом.
+ for(const zz of [4,365]){
+  box(cx-48,motorMountY-18,zz,cx+48,motorMountY+18,zz+10,'outerDark');
+  for(const xx of [cx-25,cx+25])cylZ(xx,motorMountY,4,zz+10,zz+13,'bolt',12);
+ }
+ // Площадка мотора на траверсе и четыре шпильки крепления.
+ box(cx-48,motorMountY+7,cz-48,cx+48,motorMountY+12,cz+48,'outerDark');
+ for(const dx of [-39,39])for(const dz of [-39,39]){
+  cylY(cx+dx,cz+dz,5,motorMountY+12,motorMountY+19,'bolt',12);
+ }
+ // Корпус электродвигателя (цилиндрический) и его задняя крышка.
+ cylY(cx,cz,48,motorMountY+19,motorMountY+89,'motor',40); // глубина двигателя 70 мм
+ ringY(cx,cz,0,46,motorMountY+89,motorMountY+92,'outerDark',40);
+ for(let k=0;k<8;k++){
+  const a=k*Math.PI/4;
+  tube([[cx+46*Math.cos(a),motorMountY+23,cz+46*Math.sin(a)],
+        [cx+46*Math.cos(a),motorMountY+86,cz+46*Math.sin(a)]],1.6,'outerEdge');
+ }
+ // Вал мотора до ступицы наружной крыльчатки.
+ cylY(cx,cz,9,motorMountY+92,Y1-12,'bolt',24);
+ ringY(cx,cz,10,23,Y1-28,Y1-25,'outerDark',32);
+ // Трёхлопастная осевая крыльчатка по фотографиям пользователя.
+ // Три широкие плавно закрученные лопасти, заметный осевой изгиб (глубина 100 мм).
+ const fanRear=Y1-108,fanFront=Y1-8;
+ cylY(cx,cz,24,fanRear+34,fanFront-3,'outerDark',32);
+ ringY(cx,cz,18,29,fanFront-7,fanFront-3,'outerDark',40);
+ // Лопасть задана двумя параметрами: радиус и доля ширины; плавное закручивание
+ // в направлении вращения и осевой прогиб, как у реальных наружных вентиляторов.
+ const bladePoint=(base,r,t)=>{
+   const u=(r-25)/132;
+   const angle=base + .19 + .64*u + (t-.5)*(1.18-.24*u);
+   const y=fanRear + 12 + 76*t + 12*Math.sin(Math.PI*u)*Math.sin(Math.PI*t);
+   return [cx+r*Math.cos(angle),y,cz+r*Math.sin(angle)];
+ };
+ for(let k=0;k<3;k++){
+   const base=k*2*Math.PI/3;
+   for(let ir=0;ir<18;ir++)for(let it=0;it<12;it++){
+     const r0=25+132*ir/18,r1=25+132*(ir+1)/18;
+     const t0=it/12,t1=(it+1)/12;
+     const p00=bladePoint(base,r0,t0),p10=bladePoint(base,r1,t0);
+     const p11=bladePoint(base,r1,t1),p01=bladePoint(base,r0,t1);
+     face([p00,p10,p11,p01],'outerBlade');
+   }
+   // Корневое усиление лопасти возле ступицы.
+   for(let ir=0;ir<5;ir++){
+     const r0=23+ir*4,r1=r0+4;
+     face([bladePoint(base,r0,.24),bladePoint(base,r1,.24),
+           bladePoint(base,r1,.76),bladePoint(base,r0,.76)],'outerFan');
+   }
+ }
+ // Концентрические окружности и радиальные прутки защитной решетки.
+ for(let r=30;r<=160;r+=12)ringY(cx,cz,r-1,r+1,Y1+3,Y1+4,'grille',64);
+ for(let i=0;i<32;i++){
+  let a=2*Math.PI*i/32;
+  tube([[cx+23*Math.cos(a),Y1+5,cz+23*Math.sin(a)],
+        [cx+163*Math.cos(a),Y1+5,cz+163*Math.sin(a)]],1.3,'grille');
+ }
+ cylY(cx,cz,20,Y1+4,Y1+7,'grille',24);
+ // Левая боковина открыта; декоративные ламели и рамка сняты вместе с ней.
+
+}
+
+// Опоры
+for(let x of [30,440])for(let y of [30,122.5,215]){cylZ(x,y,8,-24,0,'bolt',6);if(y!==122.5){cylZ(x,y,4,-65,-24,'bolt');cylZ(x,y,19,-115,-95,'bolt');cylZ(x,y,19,-61,-41,'bolt');spring(x,y,-95,-61,13)}}
+// Испаритель НАД ванночкой: X 188.5..463.5, Y 8..48, Z 52..247.
+// Центр X=326 совпадает с осью вентилятора. Полная ширина включая изгибы =275.
+const evapX=326, left=197, right=455, front=8, back=48, bottom=52, top=247;
+box(left,front,bottom,left+3,back,top,'rail');
+box(right-3,front,bottom,right,back,top,'rail');
+for(let i=0;i<110;i++){
+ let x=left+3+i*(right-left-6)/110;
+ box(x,front,bottom+2,x+.58,back,top-2,i%6===0?'finlight':'fins');
+}
+// Горизонтальные медные трубки внутри оребрения.
+for(let j=0;j<10;j++){
+ let z=bottom+12+j*18;
+ cylX(28,z,2,left+2,right-2,'copper',10);
+}
+// U-образные боковые изгибы (включены в общий габарит 275 мм).
+for(let j=0;j<9;j++){
+ let z=bottom+12+j*18, atRight=j%2===0;
+ let x=atRight?right+2:left-2;
+ let pts=[];
+ for(let k=0;k<=16;k++){
+  let a=-Math.PI/2+k*Math.PI/16;
+  pts.push([x+(atRight?1:-1)*6.5*Math.cos(a),28,z+9+9*Math.sin(a)]);
+ }
+ tube(pts,2.7,'copper');
+}
+// Новая оранжевая трубка Ø9 мм от нижнего бокового выхода испарителя
+// к верхнему штуцеру ресивера, закреплённого на компрессоре.
+// Радиус 4.5 мм, трубка огибает перегородку и поднимается к ресиверу.
+tube([[190,28,66],[180,28,66],[171,28,66],[164,43,66],[164,105,66],[146,158,66],[120,171,66],[116,171,88],[116,171,206],[108,171,222],[86,171,222]],4.5,'orange');
+// Верхний штуцер ресивера для наглядного соединения.
+cylZ(86,171,5,218,224,'orange',16);
+// Электроника в нише над испарителем: горизонтальная полка Z=245..247.
+// Все компоненты стоят НА полке, ниже верхней крышки Z=319.
+// Рабочая геометрия, без изменения утвержденных узлов.
+// Рабочий конденсатор компрессора 30 мкФ, цилиндрический корпус.
+// Конденсатор лежит горизонтально вдоль глубины корпуса на нижней полке.
+// Центр по высоте Z=266, радиус 17 мм: нижняя точка Z=249.
+cylY(225,266,17,60,113,'capacitor',28);
+ringY(225,266,0,16,113,115,'capTop',28);
+ringY(225,266,0,16,59,60,'capTop',28);
+for(const dx of [-6,6])box(225+dx-2,115,264,225+dx+2,121,268,'terminal');
+// Плата управления расположена плашмя, горизонтально.
+box(262,28,250,397,119,252,'pcbEdge');
+box(265,31,252,394,116,253,'pcb');
+// Монтажные стойки и четыре крепежа платы.
+for(const x of [270,389])for(const y of [36,111]){
+ cylZ(x,y,3.2,247,250,'terminal',12);
+ cylZ(x,y,2.1,253,255,'terminal',12);
+}
+// Компоненты платы, разъемы и дорожки (условная геометрия).
+box(281,43,253,309,64,264,'chip');
+box(320,43,253,346,61,259,'chip');
+box(281,76,253,330,86,259,'terminal');
+box(352,44,253,383,54,264,'terminal');
+for(let k=0;k<5;k++)box(349+k*7,75,253,353+k*7,105,254,'copperPad');
+// Два отдельных прямоугольных конденсатора вентиляторов по 2 мкФ.
+for(const yy of [39,89]){
+ box(414,yy,249,453,yy+25,274,'capSmall');
+ box(414,yy,272,453,yy+25,275,'capTop');
+ for(const xx of [426,441])box(xx-2,yy+10,275,xx+2,yy+15,280,'terminal');
+}
+// Диффузор: прямоугольное основание по оребренному сердечнику,
+// без боковых медных U-образных изгибов; переход в круг перед вентилятором.
+// Основание Y=49 мм (за радиатором), круг Y=141 мм, перед крыльчаткой Y=143 мм.
+const dCX=326,dCZ=149.5,dLeft=200,dRight=452,dBottom=52,dTop=247;
+const dRectY=49,dRoundY=141,dRadius=64,dN=64;
+function rectPoint(t){ // обход прямоугольника в плоскости XZ
+  let u=(t%1+1)%1*4;
+  if(u<1)return [dRight,dRectY,dCZ+(dTop-dCZ)*u];
+  if(u<2)return [dRight-(dRight-dLeft)*(u-1),dRectY,dTop];
+  if(u<3)return [dLeft,dRectY,dTop-(dTop-dBottom)*(u-2)];
+  return [dLeft+(dRight-dLeft)*(u-3),dRectY,dBottom];
+}
+// Точное соответствие точек прямоугольника и круга по углу от центра.
+function rectangleAtAngle(a){
+  let dx=Math.cos(a),dz=Math.sin(a);
+  let tx=dx>0?(dRight-dCX)/dx:dx<0?(dLeft-dCX)/dx:Infinity;
+  let tz=dz>0?(dTop-dCZ)/dz:dz<0?(dBottom-dCZ)/dz:Infinity;
+  let t=Math.min(tx,tz);
+  return [dCX+dx*t,dRectY,dCZ+dz*t];
+}
+for(let k=0;k<dN;k++){
+  let a=2*Math.PI*k/dN,b=2*Math.PI*(k+1)/dN;
+  let p=rectangleAtAngle(a),q=rectangleAtAngle(b);
+  let r=[dCX+dRadius*Math.cos(a),dRoundY,dCZ+dRadius*Math.sin(a)];
+  let v=[dCX+dRadius*Math.cos(b),dRoundY,dCZ+dRadius*Math.sin(b)];
+  face([p,q,v,r],'diffuser');
+}
+// Усиленный круговой буртик вплотную к передней плоскости крыльчатки.
+ringY(dCX,dCZ,dRadius-2,dRadius+1,dRoundY-2,dRoundY,'diffuserEdge',64);
+// Движение воды: капли стекают по радиатору, часть подхватывается воздушным потоком
+// в сторону лицевой решётки; над красной трубкой видны испаряющиеся капли.
+// Воздушные потоки: оранжевые стрелки перед испарителем и синие
+// через квадратное отверстие 100x100 с поворотом к лицевой панели.
+// Лицевая крышка условная: показываем направление выброса, не закрывая детали.
+function airArrow(a,b,color,r=2.2){
+ tube([a,b],r,color);
+ const d=b.map((v,i)=>v-a[i]),L=Math.hypot(...d),u=d.map(v=>v/L);
+ const base=b.map((v,i)=>v-u[i]*13);
+ const side=Math.abs(u[2])>.8?[1,0,0]:[0,0,1];
+ const cross=[u[1]*side[2]-u[2]*side[1],u[2]*side[0]-u[0]*side[2],u[0]*side[1]-u[1]*side[0]];
+ for(let k=0;k<4;k++){
+  const angle=k*Math.PI/2;
+  const off=cross.map((v,i)=>v*Math.cos(angle)*7+side[i]*Math.sin(angle)*7);
+  face([b,base.map((v,i)=>v+off[i]),base.map((v,i)=>v-off[i])],color);
+ }
+}
+const fixedFaces=F.length;
+let waterFrame=0;
+// Фиксированные границы камеры: капли больше не меняют масштаб и центр кадра.
+const cameraBounds=F.flatMap(q=>q.p.map(p=>[...p]));
+cameraBounds.push([-60,365,0],[335,800,390],[210,-135,90],[470,-100,385]);
+function movingWater(){
+ F.length=fixedFaces;
+ const t=waterFrame++;
+ // Тёплый комнатный воздух поступает с лицевой стороны к испарителю (Y растёт).
+ for(let i=0;i<12;i++){
+  const x=218+(i%4)*69, z=85+Math.floor(i/4)*57;
+  const q=((t*3.1+i*19)%92)/92;
+  const y=-106+q*77;
+  airArrow([x,y,z],[x,y+24,z],'warmAir',2.5);
+ }
+ // Холодный поток проходит через квадратное отверстие X=368..468,Y=143..243
+ // и далее поворачивает к лицевой стороне, как при установленной крышке.
+ for(let i=0;i<7;i++){
+  const x=379+(i%3)*35, y=163+Math.floor(i/3)*29;
+  const q=((t*2.2+i*17)%90)/90;
+  const z=292+q*85;
+  if(z<340)airArrow([x,y,z],[x,y,z+22],'coldAir',2.2);
+ }
+ // После квадратного отверстия поток распределяется по ВСЕЙ горизонтальной
+ // поверхности от перегородки компрессорного отсека (X≈186) до правого края.
+ // Затем стрелки выходят за лицевую плоскость Y=0 наружу (до Y=-135).
+ for(let i=0;i<30;i++){
+  const x=202+(i%10)*27.5, z=347+Math.floor(i/10)*8;
+  const q=((t*3.0+i*17)%335)/335;
+  const y=183-q*335;
+  airArrow([x,y,z],[x,y-27,z],'coldAir',2.3);
+ }
+ // капли вдоль задней поверхности теплообменника, падают от гребёнки
+ for(let i=0;i<42;i++){
+  const x=-37+(i*43)%344;
+  const z=338-((t*3.2+i*47)%329);
+  const y=383.8+(i%3)*1.7;
+  cylZ(x,y,1.4+(i%3)*.45,z,z+3.6,'droplet',6);
+ }
+ // Дополнительные отчётливые капли на ЗАДНЕЙ стенке радиатора: струйки
+ // по всей ширине, включая участки между зубчиками короба.
+ for(let i=0;i<72;i++){
+  const x=-43+(i*37)%358;
+  const z=371-((t*2.6+i*41)%361);
+  const y=378.0+(i%4)*1.1;
+  cylZ(x,y,1.5+(i%4)*.35,z,z+4.5+(i%3)*2,'droplet',7);
+ }
+ // Капли на НАРУЖНОЙ стороне задней секции радиатора: видны сзади,
+ // стекают от верхнего короба до поддона наружного блока.
+ for(let i=0;i<78;i++){
+  const x=-40+(i*47)%351;
+  const z=373-((t*2.15+i*37)%367);
+  const y=370.5-(i%3)*0.8;
+  cylZ(x,y,1.55+(i%4)*.3,z,z+4+(i%3)*2,'droplet',6);
+ }
+ // Вылетающие ИЗ лицевой решётки капли: начинаются непосредственно
+ // перед плоскостью Y=613 и улетают наружу в направлении воздушного потока.
+ // Капли расположены в пределах круглого отверстия решётки Ø330 мм.
+ for(let i=0;i<42;i++){
+  const a=i*2.399963229728653;
+  const r=14+Math.sqrt((i+.5)/42)*145;
+  const x=136+r*Math.cos(a), z=190+r*Math.sin(a);
+  const progress=((t*5.3+i*19)%170)/170;
+  const y=615+progress*170;
+  cylZ(x,y,1.3+(i%4)*.3,z-5*progress,z+3.2-5*progress,'droplet',7);
+ }
+ // капли, срывающиеся потоком от радиатора к передней решётке (рост Y)
+ for(let i=0;i<25;i++){
+  const progress=((t*3.7+i*31)%222)/222;
+  const x=-12+(i*61)%300;
+  const z=44+(i*53)%288-8*progress;
+  const y=389+progress*218;
+  cylZ(x,y,1.2+(i%3)*.3,z,z+2.5,'droplet',6);
+ }
+ // мелкое испарение над горячим контуром в нижней части наружного блока
+ for(let i=0;i<19;i++){
+  const x=12+(i*47)%272;
+  const y=464+(i*29)%105;
+  const z=12+((t*1.3+i*17)%95);
+  cylZ(x,y,0.7+(i%3)*.25,z,z+2.2,'mist',6);
+ }
+}
+let yaw=2.45,pitch=.38,zoom=1,drag=false,px=0,py=0,pointers=new Map(),pinch=0;function rot(p){let x=p[0]-235,y=p[1]-165,z=p[2]-150,a=Math.cos(yaw),b=Math.sin(yaw),d=Math.cos(pitch),e=Math.sin(pitch),depth=x*b+y*a;return[x*a-y*b,z*d-depth*e,z*e+depth*d]}
+const vs=`attribute vec3 aPosition;attribute vec3 aColor;varying vec3 vColor;void main(){gl_Position=vec4(aPosition,1.0);vColor=aColor;}`;
+const fs=`precision mediump float;varying vec3 vColor;void main(){gl_FragColor=vec4(vColor,1.0);}`;
+function shader(type,source){let sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);return sh}
+let program=null,buffer=null,locP=null,locC=null;
+if(gl){program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vs));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(program);gl.useProgram(program);buffer=gl.createBuffer();locP=gl.getAttribLocation(program,'aPosition');locC=gl.getAttribLocation(program,'aColor');gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LESS);gl.disable(gl.CULL_FACE)}
+function render(){if(!gl)return;let w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;let dpr=Math.min(devicePixelRatio||1,2),W=Math.round(w*dpr),H=Math.round(h*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}gl.viewport(0,0,W,H);gl.clearColor(0,0,0,0);gl.clearDepth(1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+let arr=F.map(q=>({p:q.p.map(rot),c:q.c})),xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;for(let p0 of cameraBounds){let p=rot(p0);xmin=Math.min(xmin,p[0]);xmax=Math.max(xmax,p[0]);ymin=Math.min(ymin,p[1]);ymax=Math.max(ymax,p[1])}let scale=Math.min((w-24)/Math.max(1,xmax-xmin),(h-24)/Math.max(1,ymax-ymin))*zoom,mx=(xmin+xmax)/2,my=(ymin+ymax)/2;let vertices=[];
+for(let q of arr){let p=q.p;if(p.length<3)continue;let A=p[1].map((v,i)=>v-p[0][i]),B=p[2].map((v,i)=>v-p[0][i]),nz=A[0]*B[1]-A[1]*B[0],shade=.74+.26*Math.min(1,Math.abs(nz)/(Math.hypot(...A)*Math.hypot(...B)||1)),hex=C[q.c]||C.metal,num=parseInt(hex.slice(1),16),rgb=[num>>16&255,num>>8&255,num&255].map(v=>v/255*shade);for(let j=1;j<p.length-1;j++)for(let v of [p[0],p[j],p[j+1]])vertices.push((v[0]-mx)*scale*2/w,(v[1]-my)*scale*2/h,-v[2]/700,...rgb)}
+gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(vertices),gl.DYNAMIC_DRAW);gl.vertexAttribPointer(locP,3,gl.FLOAT,false,24,0);gl.enableVertexAttribArray(locP);gl.vertexAttribPointer(locC,3,gl.FLOAT,false,24,12);gl.enableVertexAttribArray(locC);gl.drawArrays(gl.TRIANGLES,0,vertices.length/6)}
+function setZoom(v){zoom=Math.max(.5,Math.min(4,v));document.getElementById('zoomlabel').textContent=Math.round(zoom*100)+'%';render()}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);pinch=0});
+cv.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;let old=pointers.get(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);if(pointers.size===1){yaw+=(e.clientX-old[0])*.012;pitch=Math.max(-2.8,Math.min(2.8,pitch+(e.clientY-old[1])*.008))}else if(pointers.size===2){let a=[...pointers.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);if(pinch)setZoom(zoom*d/pinch);pinch=d}render()});
+function release(e){pointers.delete(e.pointerId);pinch=0}cv.addEventListener('pointerup',release);cv.addEventListener('pointercancel',release);
+cv.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*(e.deltaY>0?.9:1.1))},{passive:false});
+document.getElementById('zin').onclick=()=>setZoom(zoom*1.25);document.getElementById('zout').onclick=()=>setZoom(zoom/1.25);document.getElementById('zreset').onclick=()=>setZoom(1);
+document.querySelectorAll('button').forEach(b=>b.onclick=()=>{let v=b.dataset.view;if(v==='iso'){yaw=2.45;pitch=.38}else if(v==='top'){yaw=0;pitch=1.56}else if(v==='front'){yaw=Math.PI;pitch=0}else if(v==='rear'){yaw=0;pitch=0}else if(v==='side'){yaw=-Math.PI/2;pitch=0}render()});new ResizeObserver(render).observe(cv);render();let lastWater=0;function animateWater(ms){if(ms-lastWater>110){movingWater();render();lastWater=ms}requestAnimationFrame(animateWater)}requestAnimationFrame(animateWater);
+})();</script></body></html>

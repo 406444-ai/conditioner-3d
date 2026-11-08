@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Оконный кондиционер — трёхлопастная крыльчатка наружного вентилятора</title><style>body{margin:0;background:#e9eef4;color:#172534;font:15px system-ui,Arial}header{padding:15px 18px;background:white}h1{font-size:18px;margin:0 0 5px}p{margin:4px 0;color:#526271;font-size:13px}canvas{display:block;width:100%;height:70vh;min-height:380px;touch-action:none;background:linear-gradient(#f5f8fb,#dce6ef)}nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px}button{border:1px solid #bcc8d5;border-radius:8px;background:white;padding:10px 14px;font-size:14px}footer{font-size:12px;text-align:center;color:#647484;padding:0 12px 20px}</style></head><body><header><h1>Оконный кондиционер — воздушные потоки и охлаждение</h1><p>Испаритель 275 × 195 × 40 мм расположен над ванночкой (Z=52–247 мм). Вентилятор расположен по центру испарителя (ось Z=149,5 мм). Добавлен прямоугольно-круглый диффузор: выход Ø128 мм немного меньше внутреннего входного кольца вентилятора Ø134 мм. Левая боковая стенка со стороны испарителя снята; остальные элементы сохранены. В нише над испарителем размещены горизонтально лежащий конденсатор компрессора 30 мкФ, горизонтальная плата управления и два прямоугольных конденсатора вентиляторов по 2 мкФ. Добавлена сплошная горизонтальная перегородка на отметке Z=320 мм, полностью закрывающая сверху только отсек вентилятора; ее край повторяет перегородку компрессорного отсека, без захода в компрессорный отсек. Квадратное отверстие 100 × 100 мм расположено в дальнем углу. Одна вертикальная стенка вдоль Y=143 продлена до перегородки компрессорного отсека, от X=186 до X=468, на высотах Z=247–319 мм. Под ней добавлена сплошная горизонтальная стенка на высоте Z=245–247 мм, между вертикальной стенкой, боковой стенкой, задней стенкой и перегородкой компрессорного отсека. Сохранены все остальные детали и управление масштабом.</p></header><canvas id="view"></canvas><nav><button data-view="iso">Общий вид</button><button data-view="top">Сверху</button><button data-view="front">Спереди</button><button data-view="rear">Сзади</button><button data-view="side">Сбоку</button><button id="zout">−</button><span id="zoomlabel" style="align-self:center">100%</span><button id="zin">+</button><button id="zreset">Сброс масштаба</button></nav><footer>Поворачивайте одним пальцем, увеличивайте двумя пальцами или кнопками. WebGL с буфером глубины. Файл автономный, интернет не нужен.</footer><script>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Оконный кондиционер — трёхлопастная крыльчатка наружного вентилятора</title><style>body{margin:0;background:#e9eef4;color:#172534;font:15px system-ui,Arial}header{padding:15px 18px;background:white}h1{font-size:18px;margin:0 0 5px}p{margin:4px 0;color:#526271;font-size:13px}canvas{display:block;width:100%;height:70vh;min-height:380px;touch-action:none;background:linear-gradient(#f5f8fb,#dce6ef)}nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px}button{border:1px solid #bcc8d5;border-radius:8px;background:white;padding:10px 14px;font-size:14px}footer{font-size:12px;text-align:center;color:#647484;padding:0 12px 20px}</style></head><body><canvas id="view"></canvas><nav><button data-view="iso">Общий вид</button><button data-view="top">Сверху</button><button data-view="front">Спереди</button><button data-view="rear">Сзади</button><button data-view="side">Сбоку</button><button id="zout">−</button><span id="zoomlabel" style="align-self:center">100%</span><button id="zin">+</button><button id="zreset">Сброс масштаба</button><button id="pauseAnim" aria-pressed="false">⏸ Остановить анимацию</button></nav><footer>Вращайте одним пальцем в обратном направлении; двумя пальцами перемещайте модель и увеличивайте нужную область. На Mac увеличивайте колесом над выбранной деталью. WebGL с буфером глубины. Файл автономный, интернет не нужен.</footer><script>
 (()=>{
 const cv=document.getElementById('view'),gl=cv.getContext('webgl',{antialias:true,alpha:true}),F=[];
 const C={metal:'#b8c2cb',well:'#91aabd',pan:'#7ca8c6',floor:'#a5c9dc',black:'#292d35',receiver:'#373d46',divider:'#a6b7c7',blue:'#5185c4',blade:'#343941',rim:'#4c525b',motor:'#59616b',bolt:'#929ba6',rubber:'#454950',green:'#359b51',orange:'#ef5729',float:'#39383d',port:'#656b72',spigot:'#cda36b',tube:'#41bbd0',pump:'#e75b32',pumpcap:'#f0784d',white:'#dedfdb',connection:'#35b777',outlet:'#b05ce8',fins:'#384d55',finlight:'#56747a',copper:'#b77743',rail:'#8d9aa5',diffuser:'#9eb7c8',diffuserEdge:'#69899e',pcb:'#237653',pcbEdge:'#164e3b',chip:'#252c36',terminal:'#c7d3df',capacitor:'#d9e0e5',capTop:'#667483',capSmall:'#e4e8ed',copperPad:'#d6a94e',redHot:'#e13a34',blueLiquid:'#217ee8',outer:'#e3e6e8',outerEdge:'#aeb6be',outerDark:'#8c969f',grille:'#f2f4f4',outerFan:'#454d55',outerBlade:'#68747d',outerFins:'#334b55',fanCable:'#20252c',boxGray:'#a3a8ae',water:'#67d7f4',waterDeep:'#3aa7d8',droplet:'#89e4ff',mist:'#b4edfa',warmAir:'#ef3030',coldAir:'#1688f5'};
@@ -504,28 +504,28 @@ function movingWater(){
  F.length=fixedFaces;
  const t=waterFrame++;
  // Тёплый комнатный воздух поступает с лицевой стороны к испарителю (Y растёт).
- for(let i=0;i<12;i++){
-  const x=218+(i%4)*69, z=85+Math.floor(i/4)*57;
+ for(let i=0;i<6;i++){
+  const x=235+(i%3)*95, z=95+Math.floor(i/3)*92;
   const q=((t*3.1+i*19)%92)/92;
   const y=-106+q*77;
-  airArrow([x,y,z],[x,y+24,z],'warmAir',2.5);
+  airArrow([x,y,z],[x,y+38,z],'warmAir',3.8);
  }
  // Холодный поток проходит через квадратное отверстие X=368..468,Y=143..243
  // и далее поворачивает к лицевой стороне, как при установленной крышке.
- for(let i=0;i<7;i++){
-  const x=379+(i%3)*35, y=163+Math.floor(i/3)*29;
+ for(let i=0;i<4;i++){
+  const x=385+(i%2)*55, y=170+Math.floor(i/2)*47;
   const q=((t*2.2+i*17)%90)/90;
   const z=292+q*85;
-  if(z<340)airArrow([x,y,z],[x,y,z+22],'coldAir',2.2);
+  if(z<340)airArrow([x,y,z],[x,y,z+34],'coldAir',3.6);
  }
  // После квадратного отверстия поток распределяется по ВСЕЙ горизонтальной
  // поверхности от перегородки компрессорного отсека (X≈186) до правого края.
  // Затем стрелки выходят за лицевую плоскость Y=0 наружу (до Y=-135).
- for(let i=0;i<30;i++){
-  const x=202+(i%10)*27.5, z=347+Math.floor(i/10)*8;
+ for(let i=0;i<12;i++){
+  const x=210+(i%6)*49, z=348+Math.floor(i/6)*15;
   const q=((t*3.0+i*17)%335)/335;
   const y=183-q*335;
-  airArrow([x,y,z],[x,y-27,z],'coldAir',2.3);
+  airArrow([x,y,z],[x,y-43,z],'coldAir',3.8);
  }
  // капли вдоль задней поверхности теплообменника, падают от гребёнки
  for(let i=0;i<42;i++){
@@ -577,7 +577,7 @@ function movingWater(){
   cylZ(x,y,0.7+(i%3)*.25,z,z+2.2,'mist',6);
  }
 }
-let yaw=2.45,pitch=.38,zoom=1,drag=false,px=0,py=0,pointers=new Map(),pinch=0;function rot(p){let x=p[0]-235,y=p[1]-165,z=p[2]-150,a=Math.cos(yaw),b=Math.sin(yaw),d=Math.cos(pitch),e=Math.sin(pitch),depth=x*b+y*a;return[x*a-y*b,z*d-depth*e,z*e+depth*d]}
+let yaw=2.45,pitch=.38,zoom=1,panX=0,panY=0,pointers=new Map();function rot(p){let x=p[0]-235,y=p[1]-165,z=p[2]-150,a=Math.cos(yaw),b=Math.sin(yaw),d=Math.cos(pitch),e=Math.sin(pitch),depth=x*b+y*a;return[x*a-y*b,z*d-depth*e,z*e+depth*d]}
 const vs=`attribute vec3 aPosition;attribute vec3 aColor;varying vec3 vColor;void main(){gl_Position=vec4(aPosition,1.0);vColor=aColor;}`;
 const fs=`precision mediump float;varying vec3 vColor;void main(){gl_FragColor=vec4(vColor,1.0);}`;
 function shader(type,source){let sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);return sh}
@@ -585,13 +585,50 @@ let program=null,buffer=null,locP=null,locC=null;
 if(gl){program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vs));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(program);gl.useProgram(program);buffer=gl.createBuffer();locP=gl.getAttribLocation(program,'aPosition');locC=gl.getAttribLocation(program,'aColor');gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LESS);gl.disable(gl.CULL_FACE)}
 function render(){if(!gl)return;let w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;let dpr=Math.min(devicePixelRatio||1,2),W=Math.round(w*dpr),H=Math.round(h*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}gl.viewport(0,0,W,H);gl.clearColor(0,0,0,0);gl.clearDepth(1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 let arr=F.map(q=>({p:q.p.map(rot),c:q.c})),xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;for(let p0 of cameraBounds){let p=rot(p0);xmin=Math.min(xmin,p[0]);xmax=Math.max(xmax,p[0]);ymin=Math.min(ymin,p[1]);ymax=Math.max(ymax,p[1])}let scale=Math.min((w-24)/Math.max(1,xmax-xmin),(h-24)/Math.max(1,ymax-ymin))*zoom,mx=(xmin+xmax)/2,my=(ymin+ymax)/2;let vertices=[];
-for(let q of arr){let p=q.p;if(p.length<3)continue;let A=p[1].map((v,i)=>v-p[0][i]),B=p[2].map((v,i)=>v-p[0][i]),nz=A[0]*B[1]-A[1]*B[0],shade=.74+.26*Math.min(1,Math.abs(nz)/(Math.hypot(...A)*Math.hypot(...B)||1)),hex=C[q.c]||C.metal,num=parseInt(hex.slice(1),16),rgb=[num>>16&255,num>>8&255,num&255].map(v=>v/255*shade);for(let j=1;j<p.length-1;j++)for(let v of [p[0],p[j],p[j+1]])vertices.push((v[0]-mx)*scale*2/w,(v[1]-my)*scale*2/h,-v[2]/700,...rgb)}
+for(let q of arr){let p=q.p;if(p.length<3)continue;let A=p[1].map((v,i)=>v-p[0][i]),B=p[2].map((v,i)=>v-p[0][i]),nz=A[0]*B[1]-A[1]*B[0],shade=.74+.26*Math.min(1,Math.abs(nz)/(Math.hypot(...A)*Math.hypot(...B)||1)),hex=C[q.c]||C.metal,num=parseInt(hex.slice(1),16),rgb=[num>>16&255,num>>8&255,num&255].map(v=>v/255*shade);for(let j=1;j<p.length-1;j++)for(let v of [p[0],p[j],p[j+1]])vertices.push(((v[0]-mx)*scale+panX)*2/w,((v[1]-my)*scale+panY)*2/h,-v[2]/700,...rgb)}
 gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(vertices),gl.DYNAMIC_DRAW);gl.vertexAttribPointer(locP,3,gl.FLOAT,false,24,0);gl.enableVertexAttribArray(locP);gl.vertexAttribPointer(locC,3,gl.FLOAT,false,24,12);gl.enableVertexAttribArray(locC);gl.drawArrays(gl.TRIANGLES,0,vertices.length/6)}
-function setZoom(v){zoom=Math.max(.5,Math.min(4,v));document.getElementById('zoomlabel').textContent=Math.round(zoom*100)+'%';render()}
-cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);pinch=0});
-cv.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;let old=pointers.get(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);if(pointers.size===1){yaw+=(e.clientX-old[0])*.012;pitch=Math.max(-2.8,Math.min(2.8,pitch+(e.clientY-old[1])*.008))}else if(pointers.size===2){let a=[...pointers.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);if(pinch)setZoom(zoom*d/pinch);pinch=d}render()});
-function release(e){pointers.delete(e.pointerId);pinch=0}cv.addEventListener('pointerup',release);cv.addEventListener('pointercancel',release);
-cv.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom*(e.deltaY>0?.9:1.1))},{passive:false});
-document.getElementById('zin').onclick=()=>setZoom(zoom*1.25);document.getElementById('zout').onclick=()=>setZoom(zoom/1.25);document.getElementById('zreset').onclick=()=>setZoom(1);
-document.querySelectorAll('button').forEach(b=>b.onclick=()=>{let v=b.dataset.view;if(v==='iso'){yaw=2.45;pitch=.38}else if(v==='top'){yaw=0;pitch=1.56}else if(v==='front'){yaw=Math.PI;pitch=0}else if(v==='rear'){yaw=0;pitch=0}else if(v==='side'){yaw=-Math.PI/2;pitch=0}render()});new ResizeObserver(render).observe(cv);render();let lastWater=0;function animateWater(ms){if(ms-lastWater>110){movingWater();render();lastWater=ms}requestAnimationFrame(animateWater)}requestAnimationFrame(animateWater);
+function setZoom(v,anchorX=cv.clientWidth/2,anchorY=cv.clientHeight/2){
+ const next=Math.max(.5,Math.min(12,v)),ratio=next/zoom;
+ panX=(anchorX-cv.clientWidth/2)+(panX-(anchorX-cv.clientWidth/2))*ratio;
+ panY=(cv.clientHeight/2-anchorY)+(panY-(cv.clientHeight/2-anchorY))*ratio;
+ zoom=next;document.getElementById('zoomlabel').textContent=Math.round(zoom*100)+'%';render();
+}
+function pointerPos(e){const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
+function midpoint(){const a=[...pointers.values()];return [(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2]}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pointers.set(e.pointerId,pointerPos(e))});
+cv.addEventListener('pointermove',e=>{
+ if(!pointers.has(e.pointerId))return;
+ const old=pointers.get(e.pointerId),before=[...pointers.values()],p=pointerPos(e);
+ pointers.set(e.pointerId,p);
+ if(pointers.size===1){
+   yaw-=(p[0]-old[0])*.012;
+   pitch=Math.max(-2.8,Math.min(2.8,pitch+(p[1]-old[1])*.008));
+ }else if(pointers.size===2){
+   const after=[...pointers.values()];
+   const prevMid=[(before[0][0]+before[1][0])/2,(before[0][1]+before[1][1])/2];
+   const nextMid=midpoint();
+   panX+=nextMid[0]-prevMid[0];panY-=nextMid[1]-prevMid[1];
+   const prevDist=Math.hypot(before[0][0]-before[1][0],before[0][1]-before[1][1]);
+   const nextDist=Math.hypot(after[0][0]-after[1][0],after[0][1]-after[1][1]);
+   if(prevDist>1)setZoom(zoom*nextDist/prevDist,...nextMid);
+ }
+ render();
+});
+function release(e){pointers.delete(e.pointerId)}
+cv.addEventListener('pointerup',release);cv.addEventListener('pointercancel',release);
+cv.addEventListener('wheel',e=>{e.preventDefault();const p=pointerPos(e);setZoom(zoom*(e.deltaY>0?.9:1.1),...p)},{passive:false});
+document.getElementById('zin').addEventListener('click',()=>setZoom(zoom*1.25));
+document.getElementById('zout').addEventListener('click',()=>setZoom(zoom/1.25));
+document.getElementById('zreset').addEventListener('click',()=>{zoom=1;panX=0;panY=0;document.getElementById('zoomlabel').textContent='100%';render()});
+document.querySelectorAll('button[data-view]').forEach(b=>b.addEventListener('click',()=>{let v=b.dataset.view;if(v==='iso'){yaw=2.45;pitch=.38}else if(v==='top'){yaw=0;pitch=1.56}else if(v==='front'){yaw=Math.PI;pitch=0}else if(v==='rear'){yaw=0;pitch=0}else if(v==='side'){yaw=-Math.PI/2;pitch=0}render()}));
+let animationPaused=false,lastWater=0;
+document.getElementById('pauseAnim').addEventListener('click',()=>{
+ animationPaused=!animationPaused;
+ const btn=document.getElementById('pauseAnim');
+ btn.textContent=animationPaused?'▶ Возобновить анимацию':'⏸ Остановить анимацию';
+ btn.setAttribute('aria-pressed',String(animationPaused));
+ render();
+});
+new ResizeObserver(render).observe(cv);render();
+function animateWater(ms){if(!animationPaused && ms-lastWater>110){movingWater();render();lastWater=ms}requestAnimationFrame(animateWater)}requestAnimationFrame(animateWater);
 })();</script></body></html>
